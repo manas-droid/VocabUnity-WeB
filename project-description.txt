@@ -1,0 +1,136 @@
+init :
+
+1.a word 
+2.example showing the usage
+3.language -- limited options
+
+not part of the database -- ibm watson to learn pronunciation
+
+
+
+features:
+
+1.to learn better add a news fragment where people could read 
+  latest news.
+
+	same word -> diff examples
+
+2. have a search fragment where one could the 
+   same word they added but for different examples.
+
+3. one could upvote the example 
+
+4. add the same example to their library.
+
+
+
+user -> userId,postId 
+	userName user-email -- part of authentication
+	
+post -> posId wordName wordExample userId upvoteCount language
+
+
+upvote -> userId postId		 
+
+
+wordExamples -- Array of examples
+	sentence one 
+	sentence two
+	sentence three
+	etc -- limit to be decided
+
+
+
+example: (exampleId,wordId, example) --> 
+wordId from post;
+
+post :(wordId , word , userId , language , upvote) -->
+wordId == primaryKey , userId from user
+
+
+ 
+upVote(userId , wordId)
+
+1 user can have many words and examples
+1 word can have many examples
+
+
+add Another Example:
+check if the word exist
+if true : add example with the wordId and userId
+
+else : create a word with userId,word,upvote and the example 
+
+
+index wordName so that users could search for different examples
+
+
+
+add post 
+get the wordId
+add the example
+
+
+
+User:
+username
+id --> primary key
+photoURL
+createdAt
+
+
+Post:
+id
+word
+upvote
+userid
+language
+createdAt
+
+
+UpVote :
+userid
+postid
+
+Example : 
+id
+postid
+example
+createdAt
+
+
+CREATE TABLE User(
+	id VARCHAR(255) PRIMARY KEY,
+	username VARCHAR(255) CHECK (LENGTH(username)>=4 
+ 	AND LENGTH(username) <=30) UNIQUE NOT NULL,
+	photoURL VARCHAR(255) NOT NULL,
+	createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP()		
+);
+
+
+CREATE TABLE Post(
+	id INT PRIMARY KEY,
+	word VARCHAR(255) CHECK(LENGTH(word)<64),
+	upvote INT DEFAULT 0,
+	userid  VARCHAR(255),
+	language VARCHAR(255) NOT NULL,
+	FOREIGN KEY (userid) REFERENCES User(id) ON DELETE CASCADE,
+	createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP()		
+);
+
+CREATE TABLE Example(
+	id INT PRIMARY KEY,
+	postid INT NOT NULL,
+	example TEXT NOT NULL,
+	createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+	FOREIGN KEY (postid) REFERENCES Post(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE UpVote(
+	userid VARCHAR(255) ,
+	postid INT,
+	FOREIGN KEY (postid) REFERENCES Post(id) ON DELETE CASCADE,
+	FOREIGN KEY (userid) REFERENCES User(id) ON DELETE CASCADE,
+	PRIMARY KEY (userid , postid)
+);
