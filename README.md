@@ -11,4 +11,5 @@ the user could add the different examples to their vocab, the suggestions are ba
 Deployed MySQL server on CLEVER CLOUD
 
 Front-End : React
+
 Back-End  : Node,Express

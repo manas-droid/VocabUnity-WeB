@@ -11,9 +11,8 @@ export function useAuth(){
 }
 
 export function AuthProvider({children}){
-
-    const [currentUser , setCurrentUser] = useState();
-    const [loading , setLoading] = useState(false);
+    const [currentUser , setCurrentUser] = useState(null);
+    const [loading , setLoading] = useState(true);
 
     const signUp = async (email , password)=>{
         const result = await auth.createUserWithEmailAndPassword(email , password)
@@ -31,25 +30,22 @@ export function AuthProvider({children}){
     const updateProfile = (photoURL , displayName)=> currentUser.updateProfile({photoURL , displayName}); 
 
     useEffect(()=>{
-        const unsubscribe = auth.onAuthStateChanged(user=>{ 
+        auth.onAuthStateChanged(user=>{ 
             setCurrentUser(user);
-            setLoading(false);    
+            setLoading(false);
         });
-        return unsubscribe
-    } , []);
-    
 
-   
-    const value = {
-        currentUser,
-        login,
-        signUp,
-        logout,
-        updateProfile
-    };
+    } , []);
 
     return (
-        <AuthContext.Provider value={value} >
+        <AuthContext.Provider value={{
+            currentUser,
+            login,
+            signUp,
+            logout,
+            updateProfile
+        }}>
+
             {!loading && children}
         </AuthContext.Provider>
     );
