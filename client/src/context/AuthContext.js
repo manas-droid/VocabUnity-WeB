@@ -1,5 +1,5 @@
 import React, { useContext , useState , useEffect} from 'react';
-import {auth} from '../firebase';
+import {auth} from '../components/firebase';
 
 const BACKEND = "http://localhost:5000/api/users/add";
 

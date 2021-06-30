@@ -3,7 +3,6 @@ import UserModel from '../database/models/User';
 const addUser = async (req,res)=>{
     console.log(req.body);
     const {displayName , photoURL, uid} = req.body;
-
     if(!uid) return res.status(403).json({"user" : "id not defined" , "ok":false});
     try {   
         const response = await UserModel.addUser(uid,displayName || Math.random().toString(36).substring(8), photoURL || 'http://lorempixel.com/400/200/');
@@ -16,11 +15,35 @@ const addUser = async (req,res)=>{
 }
 
 
-const fetchUser = (req,res)=>{
-    return res.status(200).json({"user" : "successfully added user" , "ok" : true});
+const fetchUser = async (req,res)=>{
+    const {id} = req.body;
+    try {
+        const response = await UserModel.getUser(id);
+        return res.status(200).json({"user": response[0][0] , "ok":true });
+    } catch (error) {
+        console.log(error);
+        return res.status(503).json({"user" : "failed fetched user" , "ok" : false});
+        
+    }
 }
+
+const updateUser = async (req,res)=>{
+    const {id , username , photoURL} = req.body;
+    try {
+        const response = await UserModel.updateUser(id,username,photoURL);
+        console.log(response);
+        return res.status(200).json({"user":"successfully updated user" , "ok":true});
+    } catch (error) {
+        console.log(error);
+        return res.status(503).json({"user":"failed to update user" , "ok":false});
+    }
+
+}
+
+
 
 export {
     addUser,
-    fetchUser
+    fetchUser,
+    updateUser
 };

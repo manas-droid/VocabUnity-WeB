@@ -31,7 +31,7 @@ class Post{
 
 
     static getPost(userid){
-        const QUERY  = `SELECT p.id as postid,word,example,language 
+        const QUERY  = `SELECT p.id as postid,word,example,language , e.id as exampleid
                         FROM Post as p , Example as e 
                         WHERE p.id = e.postid and p.userid = ?;`;
         
@@ -59,7 +59,7 @@ class Post{
 
     static async findOtherExamples(word){
         const OTHER_EXAMPLES = `
-            SELECT word,example, p.id as postid , photoURL as userimage, username,upvote
+            SELECT word,example, p.id as postid , photoURL as userimage, username,upvote,language,e.id as exampleid
             FROM Post as p , User as u , Example as e
             WHERE p.userid = u.id AND
             p.id = e.postid

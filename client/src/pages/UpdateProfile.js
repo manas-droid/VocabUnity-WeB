@@ -1,6 +1,6 @@
 import React  from 'react';
 import {Form , Button , Container} from 'semantic-ui-react';
-import {useAuth} from './context/AuthContext';
+import {useAuth} from '../context/AuthContext';
 function UpdateProfile(){
     const {updateProfile} = useAuth();
     const photoRef = React.useRef();

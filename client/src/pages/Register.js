@@ -1,7 +1,7 @@
 import React , {useRef} from 'react'
 
-import { Button, Form,Container , Header , Card } from 'semantic-ui-react'
-import { useAuth } from './context/AuthContext';
+import { Button, Form , Header , Segment , Grid , Image , Message } from 'semantic-ui-react'
+import { useAuth } from '../context/AuthContext';
 import {Link} from 'react-router-dom';
 
 const Register = () => {  
@@ -22,10 +22,40 @@ const handleSubmit = async (e)=>{
 
 
 return (
-    <Container style={{ marginTop: "40px" }}>
-        <Card raised centered style={{ padding: "20px", maxWidth: "500px", minWidth: "300px", width: "60%" }}>
-            <Header textAlign="center" as="h1"> Sign Up </Header>
+    <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
+        <Grid.Column style={{ maxWidth: 500 }}>
+            <Header as='h2' color="blue" textAlign='center'>
+                <Image src='https://toppng.com/uploads/preview/community-icon-one-stop-solution-icon-11553449230cw4322bto3.png' style={{borderRadius: "50px"}} /> 
+                Sign Up to be part of the Vocabunity
+            </Header>
             <Form onSubmit={handleSubmit}>
+                <Segment stacked>
+                    <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' />
+
+                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' />
+                    
+                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Confirm Password' type='password' />
+
+                    <Button primary fluid size='large'>Sign Up</Button>
+                </Segment>
+            </Form>
+            <Message>
+                 Already have an account? <Link to='/login'>login</Link>
+            </Message>
+
+        </Grid.Column>
+    </Grid>
+  );
+
+}
+
+export default Register;
+
+
+
+
+/*
+ <Form onSubmit={handleSubmit}>
                 <Form.Field>
                     <label>Email</label>
                     <input placeholder='Enter email' type="email" required ref={emailRef} />
@@ -47,10 +77,4 @@ return (
 
                 <Button primary type='submit' fluid>Sign Up</Button>
             </Form>
-        </Card>
-    </Container>
-  );
-
-}
-
-export default Register;
+*/

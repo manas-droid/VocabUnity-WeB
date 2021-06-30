@@ -73,11 +73,11 @@ const findOtherExamples = async (req,res)=>{
 
     const post  = response[0].reduce((overall , current)=>{ 
     if(overall.get(current.postid)){
-        overall.get(current.postid).example.push(current.example);
+        overall.get(current.postid).example.push({exampleid : current.exampleid  , example:current.example });
     }else{
 
-        if(!isAnotherExample) overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [current.example, ] , "word" : current.word})
-        else overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [current.example, ] , "word" : current.word , "username" : current.username , "userimage" : current.userimage , "upvote" : current.upvote})
+        if(!isAnotherExample) overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [{example: current.example , exampleid : current.exampleid }] , "word" : current.word})
+        else overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [{example: current.example , exampleid : current.exampleid }] , "word" : current.word , "username" : current.username , "userimage" : current.userimage , "upvote" : current.upvote})
     } 
     return overall;
     }, new Map());
