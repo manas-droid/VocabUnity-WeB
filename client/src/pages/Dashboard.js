@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {Segment, Header , Icon , Button , Container , Card , Loader} from 'semantic-ui-react';
+import {Segment, Header , Icon , Container , Card , Loader , Button} from 'semantic-ui-react';
 import {useAuth} from '../context/AuthContext';
 import {Link} from 'react-router-dom';
 import Description from "../utils/Description";
 import Word from "../utils/Word";
+import AddPost from "../components/AddPost";
 function Dashboard(props){
 
     const { currentUser } = useAuth();
@@ -12,8 +13,6 @@ function Dashboard(props){
     const [post , setPost] = useState(null);
 
     useEffect(()=>{
-        console.log("here");
-
         async function fetchData(){
             const response = await fetch('http://localhost:5000/api/posts/get' , {
                 method : "POST",
@@ -28,25 +27,13 @@ function Dashboard(props){
             return;
         }
         fetchData();
-
     } , [uid]);
 
-    console.log(post);
 
-    if(!post) return <Loader style = {{margin :"200px auto"}} />
-
-
+    if(!post) return <Loader  active  />
     if(!post.ok) return <>Failed to get response</>
-    
     if(post.posts.length===0) return <IfPostDoesNotExist/>
-
-
     if(!currentUser) return props.history.push('/login');
-
-   
-
-
-
 
     return(
         <Container style = {{margin :"200px auto"}}>
@@ -55,10 +42,10 @@ function Dashboard(props){
                     post.posts.map((p)=>{
                         return (
                             <Card key = {p.postid} 
-                            header={<Word word={p.word}/>} 
+                            header={<Word word={p.word} language={p.language}/>} 
                             meta = {`language : ${p.language}`} 
                             description = {<Description examples={p.example} />}
-                            extra ={<SearchOtherExamples word={p.word}/>}
+                            extra ={<Extra word={p.word} userid={uid} postid={p.postid}/>}
                             />
                         )
                     })
@@ -71,16 +58,47 @@ function Dashboard(props){
 }
 
 
+const handleDeletePost = async (userid,postid)=>{
+    const URL = 'http://localhost:5000/api/posts/delete-post';
+
+    try {
+        const response = await fetch(URL , {
+            method:"POST",
+            headers:{
+                'Content-Type':'application/json',
+            },
+            body : JSON.stringify({"userid":userid , "postid":postid}),
+        })
+
+        const jsonResponse = await response.json();
+        console.log(jsonResponse);
+        
+    } catch (error) {
+        console.log(error);
+    }
+
+};
 
 
-const SearchOtherExamples = ({word})=>(
-    <Link to = {`/search-examples?word=${word}`}>
-        check out for other examples
-        <span style={{marginLeft:5}}>
-            <Icon name='arrow right' />
-        </span>
-    </Link>
-)
+
+const Extra = ({word , userid , postid})=>{
+    const [disable , setDisable] = useState(false );
+
+
+return<Container>
+        <Link to = {`/search-examples?word=${word}`} style={{float : 'left'}}>
+            check out for other examples
+            <span style={{marginLeft:5}}>
+                <Icon name='arrow right' />
+            </span>
+        </Link>
+
+        <Button  disabled = {disable}   style={{float : 'right'}} negative onClick= {()=>{  
+            setDisable(true);
+            handleDeletePost(userid,postid); 
+            }}> Delete </Button>
+    </Container>
+}
 
 
 
@@ -96,9 +114,12 @@ const IfPostDoesNotExist = ()=>(
       <Icon name='add'/>
         Add a Word to your Vocab
     </Header>
-    <Button primary>Add Word</Button>
+    <AddPost/>
 </Segment>   
 )
+
+
+
 
 
 export default Dashboard;

@@ -17,7 +17,7 @@ const Examples = ({sentence , isExample})=>{
         {
            isExample?( 
             <List.Content floated='right'>
-                <Button secondary>Add example to your Vocab</Button>
+                <Button secondary >Add to your Vocab</Button>
             </List.Content> ) : ""
         }
         <List.Content >{sentence}</List.Content>

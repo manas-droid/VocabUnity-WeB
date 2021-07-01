@@ -1,22 +1,32 @@
-import React , {useRef} from 'react'
+import React , {useState} from 'react'
 
 import { Button, Form , Header , Segment , Grid , Image , Message } from 'semantic-ui-react'
 import { useAuth } from '../context/AuthContext';
-import {Link} from 'react-router-dom';
+import {Link , useHistory} from 'react-router-dom';
 
 const Register = () => {  
-    const emailRef = useRef();
-    const passwordRef = useRef();
-    const confirmPasswordRef = useRef();
+    const history = useHistory();
+
+    const initUser = {
+        email : "",
+        password : "",
+        confirmPassword : "",
+        loading : false
+    };
+
+
     const { signUp }  = useAuth();
+    const [user , setUser] = useState(initUser);
 
 const handleSubmit = async (e)=>{ 
 
     e.preventDefault();
-    if(passwordRef.current.value !== confirmPasswordRef.current.value) return;
 
-    await signUp(emailRef.current.value , passwordRef.current.value);
- 
+    if(user.password !== user.confirmPassword) return;
+    setUser({...user , loading:true});
+    await signUp(user.email , user.password);
+    setUser({...user , loading:false});
+    history.push("/login");
 }
 
 
@@ -28,13 +38,13 @@ return (
                 <Image src='https://toppng.com/uploads/preview/community-icon-one-stop-solution-icon-11553449230cw4322bto3.png' style={{borderRadius: "50px"}} /> 
                 Sign Up to be part of the Vocabunity
             </Header>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} loading={user.loading}>
                 <Segment stacked>
-                    <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' />
+                    <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' onChange = {(e)=>{setUser({...user , email:e.target.value})}}/>
 
-                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' />
+                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' onChange = {(e)=>{setUser({...user , password:e.target.value})}} />
                     
-                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Confirm Password' type='password' />
+                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Confirm Password' type='password' onChange = {(e)=>{setUser({...user , confirmPassword:e.target.value})}}  />
 
                     <Button primary fluid size='large'>Sign Up</Button>
                 </Segment>
@@ -50,31 +60,3 @@ return (
 }
 
 export default Register;
-
-
-
-
-/*
- <Form onSubmit={handleSubmit}>
-                <Form.Field>
-                    <label>Email</label>
-                    <input placeholder='Enter email' type="email" required ref={emailRef} />
-                </Form.Field>
-
-                <Form.Field>
-                    <label>Password</label>
-                    <input placeholder='Enter Password' type="password" required ref={passwordRef} />
-                </Form.Field>
-
-                <Form.Field >
-                    <label>Confirm Password</label>
-                    <input placeholder='Confirm Password' type="password" required ref={confirmPasswordRef} />
-                </Form.Field>
-
-                <Form.Field>
-                    Already Have an Account?  <Link to="/login">Log in</Link>
-                </Form.Field>
-
-                <Button primary type='submit' fluid>Sign Up</Button>
-            </Form>
-*/

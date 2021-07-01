@@ -1,4 +1,22 @@
 import PostModel from "../database/models/Post";
+import TextToSpeech from 'ibm-watson/text-to-speech/v1';
+import { IamAuthenticator }from 'ibm-watson/auth';
+import transFormData from "../utils/transformData";
+import { createConnection } from "mysql2/promise";
+
+const voice = {
+    "German"  : "de-DE_BirgitV3Voice",
+    "german"  : "de-DE_BirgitV3Voice",
+    "Spanish" :  "es-ES_LauraV3Voice",
+    "spanish" :  "es-ES_LauraV3Voice",
+    "Italian" :  "it-IT_FrancescaV3Voice",
+    "italian" :  "it-IT_FrancescaV3Voice",
+    "French"  :  "fr-FR_ReneeV3Voice",
+    "french"  :  "fr-FR_ReneeV3Voice",
+    "English" :  "en-GB_CharlotteV3Voice",
+    "english" :  "en-GB_CharlotteV3Voice"
+};
+
 
 
 const addPost = async (req,res)=>{
@@ -58,37 +76,80 @@ const findOtherExamples = async (req,res)=>{
 }
 
 
- 
-// what transformData does :
-
-/* {
-    postid : 1,
-    language : german | italian | english | french | spanish,
-    example :  [example1,example2,......],
-    word  : "some_word"   
- }*/
-
-
- const transFormData = (response , isAnotherExample)=>{
-
-    const post  = response[0].reduce((overall , current)=>{ 
-    if(overall.get(current.postid)){
-        overall.get(current.postid).example.push({exampleid : current.exampleid  , example:current.example });
-    }else{
-
-        if(!isAnotherExample) overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [{example: current.example , exampleid : current.exampleid }] , "word" : current.word})
-        else overall.set(current.postid , {"postid": current.postid , "language":current.language , "example": [{example: current.example , exampleid : current.exampleid }] , "word" : current.word , "username" : current.username , "userimage" : current.userimage , "upvote" : current.upvote})
-    } 
-    return overall;
-    }, new Map());
+const getAudio = async (req, res)=>{
+    const {word , language} = req.query;
     
-    const final_response = [];
+    const textToSpeech = new TextToSpeech({
+        authenticator: new IamAuthenticator({
+          apikey: 'U2MS58-ZeMq0RN7E-UesOMk8jNHOpMNAqoffQKbz_pf5',
+        }),
+        serviceUrl: 'https://api.us-south.text-to-speech.watson.cloud.ibm.com/instances/6fcfd550-e006-48de-b90d-8090c68ac778',
+      });
 
-    for (let value of post.values()) {
-        final_response.push(value)
-    }
-    return final_response;
+
+    const synthesizeParams = {
+        text: word,
+        accept: 'audio/wav',
+        voice:voice[language],
+      };
+    const response = await textToSpeech.synthesize(synthesizeParams);
+
+    return response.result.pipe(res);
 }
 
 
-export {addPost , getPost , editPost , findOtherExamples};
+
+const deleteYourPost = async (req,res)=>{
+    const {userid , postid} = req.body;
+
+    try {
+        await PostModel.deleteYourPost(postid , userid);
+        return res.status(200).json({"post" : "deleted post successfully" , "ok":true});
+    } catch (error) {
+        console.log("DELETE POST: ",error);
+        return res.status(503).json({"post" : "couldn't post deleted" , "ok":false});
+    }
+}
+
+
+const addUpvote = async (req,res)=>{
+    const {userid,postid} = req.body;
+    try {
+        await PostModel.addUpvote(userid,postid);
+        return res.status(200).json({"post" : "upvote added successfully" , "ok":true});
+
+    } catch (error) {
+        console.log("ADD UPVOTE: ",error);
+        return res.status(503).json({"post" : "failed to add an upvote" , "ok":false});
+    }
+}
+
+const deleteUpvote = async (req,res)=>{
+    const {userid,postid} = req.body;
+    try {
+        await PostModel.deleteUpvote(userid,postid);
+        return res.status(200).json({"post" : "upvote removed successfully" , "ok":true});
+    } catch (error) {
+        console.log("REMOVE UPVOTE: ",error);   
+        return res.status(503).json({"post" : "failed to remove an upvote" , "ok":false});
+    }
+}
+
+
+const isLiked = async (req,res)=>{
+    const {userid , postid} = req.body;
+
+    try {
+        const response = await PostModel.isLiked(userid,postid);
+        console.log(response[0][0]);
+        const  check = response[0][0] ? true : false;
+        return res.status(200).json({"post": check , "ok":true});
+    } catch (error) {
+
+        console.log(error);
+        return res.status(503).json({"post":"failed" , "ok":false});
+    }
+}
+
+
+export {addPost , getPost , editPost , findOtherExamples , getAudio , deleteYourPost , addUpvote , deleteUpvote , isLiked};

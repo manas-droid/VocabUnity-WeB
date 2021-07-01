@@ -1,6 +1,6 @@
 import React, { useContext , useState , useEffect} from 'react';
 import {auth} from '../components/firebase';
-
+import { Loader } from 'semantic-ui-react';
 const BACKEND = "http://localhost:5000/api/users/add";
 
 const AuthContext = React.createContext();
@@ -37,6 +37,8 @@ export function AuthProvider({children}){
 
     } , []);
 
+    if(loading) return <Loader  active />;
+
     return (
         <AuthContext.Provider value={{
             currentUser,
@@ -46,7 +48,7 @@ export function AuthProvider({children}){
             updateProfile
         }}>
 
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 

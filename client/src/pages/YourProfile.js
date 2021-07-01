@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Segment,Form ,Grid , Button, Loader , Header , Icon} from "semantic-ui-react";
+import { Segment,Form ,Grid , Button, Loader , Header , Icon , Message} from "semantic-ui-react";
 
 const BACKEND = 'http://localhost:5000/api/users/fetch-users';
 
@@ -22,7 +22,8 @@ function YourProfile(){
             const jsonResponse = await response.json();
             setUser({
                 "username" : jsonResponse.user.username,
-                "photoURL" : jsonResponse.user.photoURL  
+                "photoURL" : jsonResponse.user.photoURL,
+                "loading"  : false  
             })
        }
        fetchData();
@@ -31,6 +32,8 @@ function YourProfile(){
     const handleUpdateProfile = async ()=>{
        console.log(user);
        try {
+
+            setUser({...user , "loading":true});
            const response = await fetch('http://localhost:5000/api/users/update-user' , {
                method:"POST",
                headers : {
@@ -40,6 +43,8 @@ function YourProfile(){
            });
            console.log(response);
            const firebaseResponse = await updateProfile(user.photoURL ,user.username );
+
+           setUser({ ...user , "loading":false , "message" : true});
            console.log(firebaseResponse);
        } catch (error) {
         console.log(error);   
@@ -48,7 +53,7 @@ function YourProfile(){
        
     }
 
-    if(!user) return <Loader/>;
+    if(!user) return <Loader active />;
 
 
     return (
@@ -58,7 +63,7 @@ function YourProfile(){
                     <Icon name='user' /> Update Your Profile
                 </Header>
 
-                <Form onSubmit = {handleUpdateProfile}>
+                <Form onSubmit = {handleUpdateProfile} loading={user.loading}>
                     <Segment stacked>
 
                         <Form.Field>
@@ -74,6 +79,15 @@ function YourProfile(){
                         <Button primary type='submit' fluid>Update Profile</Button>
                     </Segment>
                 </Form>
+                {
+                    user.message ? (
+                        <Message attached='bottom' positive>
+                            <Icon name='check' color='green'/>
+                            Successfully Updated!
+                        </Message>
+                    ) : ""
+                }
+
             </Grid.Column>
         </Grid>
     );

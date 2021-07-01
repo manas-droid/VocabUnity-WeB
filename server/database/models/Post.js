@@ -69,8 +69,81 @@ class Post{
 
         return db.query(OTHER_EXAMPLES , [word]);
     }
-    
-    
+
+
+
+    static async deleteYourPost(postid, userid){
+        const DELETE_QUERY = `
+            DELETE FROM Post
+            WHERE id = ? and userid = ?
+        `;
+        return db.query(DELETE_QUERY , [postid,userid]);
+    }
+
+    static async addUpvote(userid,postid){
+        const ADD_UPVOTE = `
+        INSERT INTO UpVote
+        (userid,postid)
+        VALUES (?,?);
+        `;
+
+        const INCREMENT_UPVOTE = `
+        UPDATE Post
+        SET upvote = upvote+1
+        WHERE id = ?
+        `;
+
+        const sql = await db.getConnection();
+
+        try {
+            await sql.beginTransaction();
+            await sql.query(ADD_UPVOTE , [userid,postid]);
+            await sql.query(INCREMENT_UPVOTE , [postid]);
+            await sql.commit();
+        } catch (error) {
+            await sql.rollback();
+            throw Error(error);
+        }finally{
+            return sql.release();
+        }
+    }
+
+
+    static async deleteUpvote(userid,postid){
+        const REMOVE_UPVOTE = `
+        DELETE FROM UpVote
+        WHERE 
+        userid = ? AND postid = ?;
+        `;
+
+        const DECREMENT_UPVOTE = `
+        UPDATE Post
+        SET upvote = upvote - 1
+        WHERE id = ?;
+        `;
+
+        try {
+            await sql.beginTransaction();
+            await sql.query(REMOVE_UPVOTE , [userid,postid]);
+            await sql.query(DECREMENT_UPVOTE , [postid]);
+            await sql.commit();
+        } catch (error) {
+            await sql.rollback();
+            throw Error(error);
+        }finally{
+            return sql.release();
+        }
+    }
+
+    static async isLiked(userid,postid){
+        const ISLIKED_QUERY = `
+          SELECT postid 
+          FROM UpVote 
+          WHERE userid = ? 
+          AND postid = ?  
+        `;
+        return db.query(ISLIKED_QUERY , [userid,postid]);
+    }
 
 }
 
