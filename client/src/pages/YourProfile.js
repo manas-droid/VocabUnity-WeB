@@ -11,7 +11,7 @@ function YourProfile(){
 
 
     useEffect(()=>{
-       async function fetchData(){
+      (async function fetchData(){
             const response = await fetch(BACKEND , {
                 method : "POST",
                 headers : {
@@ -25,12 +25,11 @@ function YourProfile(){
                 "photoURL" : jsonResponse.user.photoURL,
                 "loading"  : false  
             })
-       }
-       fetchData();
+       })();
+
     } , [uid]);
 
     const handleUpdateProfile = async ()=>{
-       console.log(user);
        try {
 
             setUser({...user , "loading":true});
@@ -49,8 +48,6 @@ function YourProfile(){
        } catch (error) {
         console.log(error);   
        }
-
-       
     }
 
     if(!user) return <Loader active />;

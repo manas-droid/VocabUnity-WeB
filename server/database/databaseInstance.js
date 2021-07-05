@@ -1,11 +1,14 @@
 import mysql from 'mysql2';
+import {config} from 'dotenv';
+config();
+
 const connection = mysql.createPool({
     connectionLimit:5,
-    host : 'bwwyqlplclf2a7bi3pzv-mysql.services.clever-cloud.com',
-    user : 'utldmkj3nlafbvfm',
-    password : 'PtI8GGcfT8Fp3aNk2vFW',
+    host : process.env.DATABASE_HOST,
+    user : process.env.DATABASE_USER,
+    password : process.env.DATABASE_PASSWORD,
     port : 3306,
-    database : 'bwwyqlplclf2a7bi3pzv',
+    database : process.env.DATABASE_NAME,
 });
 
 export default connection.promise();

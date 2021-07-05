@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import {Segment, Header , Icon , Container , Card , Loader , Button} from 'semantic-ui-react';
 import {useAuth} from '../context/AuthContext';
 import {Link} from 'react-router-dom';
-import Description from "../utils/Description";
+import Description from "../utils/Dashboard/Description";
 import Word from "../utils/Word";
 import AddPost from "../components/AddPost";
 function Dashboard(props){
 
     const { currentUser } = useAuth();
-    
+
     const {uid}  = currentUser;
     const [post , setPost] = useState(null);
 
     useEffect(()=>{
-        async function fetchData(){
+       (async function fetchData(){
             const response = await fetch('http://localhost:5000/api/posts/get' , {
                 method : "POST",
                 headers: {
@@ -25,25 +25,25 @@ function Dashboard(props){
             const jsonResponse = await response.json();
             setPost(jsonResponse);
             return;
-        }
-        fetchData();
+        })();
     } , [uid]);
 
-
+    console.log(post);
     if(!post) return <Loader  active  />
     if(!post.ok) return <>Failed to get response</>
     if(post.posts.length===0) return <IfPostDoesNotExist/>
     if(!currentUser) return props.history.push('/login');
 
     return(
-        <Container style = {{margin :"200px auto"}}>
+        <Container style = {{margin :"100px auto"}}>
+            <IfPostDoesNotExist/>
             <Card.Group itemsPerRow='1'>
                 {
                     post.posts.map((p)=>{
                         return (
-                            <Card key = {p.postid} 
-                            header={<Word word={p.word} language={p.language}/>} 
-                            meta = {`language : ${p.language}`} 
+                            <Card key = {p.postid}
+                            header={<Word word={p.word} language={p.language} isDashboard={true}/>}
+                            meta = {`language : ${p.language}`}
                             description = {<Description examples={p.example} />}
                             extra ={<Extra word={p.word} userid={uid} postid={p.postid}/>}
                             />
@@ -72,7 +72,7 @@ const handleDeletePost = async (userid,postid)=>{
 
         const jsonResponse = await response.json();
         console.log(jsonResponse);
-        
+
     } catch (error) {
         console.log(error);
     }
@@ -82,20 +82,18 @@ const handleDeletePost = async (userid,postid)=>{
 
 
 const Extra = ({word , userid , postid})=>{
-    const [disable , setDisable] = useState(false );
-
-
+    const [disable , setDisable] = useState(false);
 return<Container>
-        <Link to = {`/search-examples?word=${word}`} style={{float : 'left'}}>
+        <Link to = {`/search-examples/${postid}?word=${word}`} style={{float : 'left'}}>
             check out for other examples
             <span style={{marginLeft:5}}>
                 <Icon name='arrow right' />
             </span>
         </Link>
 
-        <Button  disabled = {disable}   style={{float : 'right'}} negative onClick= {()=>{  
+        <Button  disabled = {disable}   size="small"   style={{float : 'right'}} negative onClick= {()=>{
             setDisable(true);
-            handleDeletePost(userid,postid); 
+            handleDeletePost(userid,postid);
             }}> Delete </Button>
     </Container>
 }
@@ -105,7 +103,9 @@ return<Container>
 const IfPostDoesNotExist = ()=>(
 <Segment placeholder
     style = {{
-        margin :"200px auto",
+        marginTop :"50px",
+        marginLeft: "auto",
+        marginRight: "auto",
         maxWidth : 500,
         backgroundColor : "white"
     }}
@@ -115,7 +115,7 @@ const IfPostDoesNotExist = ()=>(
         Add a Word to your Vocab
     </Header>
     <AddPost/>
-</Segment>   
+</Segment>
 )
 
 
@@ -126,24 +126,24 @@ export default Dashboard;
 
 
 
-/* 
-{ 
-"posts": 
-[ 
-    {   "postid": 3, 
-        "language": "german", 
-        "example": [ "Ich habe noch nicht gefruhstuckt", "heute, habe ich nicht gefrühstückt.", 
-        "Was hast du zum Frühstück" ], 
-        "word": "Fruhstucken" 
-    }, 
-    { 
-        "postid": 6, 
-        "language": "spanish", 
-        "example": [ "A dónde fue el ladrón?" ], 
-        "word": "ladrón" 
-    } 
-], 
-"ok": true 
+/*
+{
+"posts":
+[
+    {   "postid": 3,
+        "language": "german",
+        "example": [ "Ich habe noch nicht gefruhstuckt", "heute, habe ich nicht gefrühstückt.",
+        "Was hast du zum Frühstück" ],
+        "word": "Fruhstucken"
+    },
+    {
+        "postid": 6,
+        "language": "spanish",
+        "example": [ "A dónde fue el ladrón?" ],
+        "word": "ladrón"
+    }
+],
+"ok": true
 }
 
 

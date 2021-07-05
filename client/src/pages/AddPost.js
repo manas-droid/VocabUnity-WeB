@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Form ,Dropdown , Container} from 'semantic-ui-react'
 import { useAuth } from '../context/AuthContext';
+import { useHistory } from 'react-router';
 const languageOptions = [
     { key: 'English', text: 'English', value: 'English' },
     { key: 'French', text: 'French', value: 'French' },
@@ -19,6 +20,7 @@ function AddPost(){
     const [post , setPost] = React.useState(initPost);
     const {currentUser} = useAuth();
     const {uid} = currentUser;
+    const history = useHistory();
 
     const handleSubmitPost =  async ()=>{
         console.log(post);
@@ -36,6 +38,7 @@ function AddPost(){
         const reponseJSON = await response.json();
         console.log(reponseJSON);
         setPost(initPost);
+        history.push("/");
     }
 
 return (
@@ -50,7 +53,6 @@ return (
                 options={languageOptions}
                 placeholder='Select Language'
                 onChange={(e) => setPost({ ...post, language: e.target.textContent })}
-    
             />
             
             <Form.Input fluid label='Example' placeholder='Example' onChange={(e) => setPost({ ...post, example: e.target.value })} />

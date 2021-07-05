@@ -22,7 +22,7 @@ function App() {
       <Route path="/signup" component={Register}/>       
       <Route path="/login"  component = {Login} /> 
       <PrivateRouter  path="/add-vocab" component={AddVocab}/>
-      <PrivateRouter path="/search-examples" component={DifferentExamples}/>
+      <PrivateRouter path="/search-examples/:postid" component={DifferentExamples}/>
       <PrivateRouter path='/your-profile' component={YourProfile}/>
       <PrivateRouter path='/add-post' component={AddPost}/>
 

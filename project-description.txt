@@ -135,7 +135,13 @@ CREATE TABLE UpVote(
 	PRIMARY KEY (userid , postid)
 );
 
-
+CREATE TABLE ExampleAdded(
+	userid VARCHAR(255),
+	exampleid INT NOT NULL,
+	FOREIGN KEY (userid) 	REFERENCES User(id) 	ON DELETE CASCADE,
+	FOREIGN KEY (exampleid) REFERENCES Example(id) 	ON DELETE CASCADE,
+	PRIMARY KEY (exampleid , userid)
+)
 
 
 SELECT p.id as postid,word,example,language FROM Post as p , Example as e WHERE p.id = e.postid and p.userid='kgh5pbdJErPLBgPNfOoJGcvsaUw1';

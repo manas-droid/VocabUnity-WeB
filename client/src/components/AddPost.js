@@ -9,8 +9,6 @@ const languageOptions = [
     { key: 'Spanish', text: 'Spanish', value: 'Spanish' },
   ]
                   
-
-
 function AddPost() {
     const initPost = {
         word     : "",
